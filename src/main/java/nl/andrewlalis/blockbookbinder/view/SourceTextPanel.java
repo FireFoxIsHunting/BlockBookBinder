@@ -5,6 +5,10 @@ import nl.andrewlalis.blockbookbinder.control.ConvertToBookActionListener;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 /**
  * A panel dedicated to displaying an interacting with a raw source of text for
@@ -22,6 +26,11 @@ public class SourceTextPanel extends JPanel {
 		this.textArea = new JTextArea();
 		this.textArea.setWrapStyleWord(true);
 		this.textArea.setLineWrap(true);
+		try {
+			this.textArea.setText(Files.readString(Path.of(this.getClass().getClassLoader().getResource("sample/lorem_ipsum.txt").toURI())));
+		} catch (IOException | URISyntaxException e) {
+			e.printStackTrace();
+		}
 		JScrollPane scrollWrappedMainTextArea = new JScrollPane(this.textArea, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		this.add(scrollWrappedMainTextArea, BorderLayout.CENTER);
 

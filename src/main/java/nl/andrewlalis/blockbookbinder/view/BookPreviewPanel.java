@@ -17,8 +17,14 @@ public class BookPreviewPanel extends JPanel {
 	@Getter
 	private Book book;
 	private int currentPage = 0;
+
 	private final JTextArea previewPageTextArea;
 	private final JLabel titleLabel;
+
+	private final JButton previousPageButton;
+	private final JButton nextPageButton;
+	private final JButton firstPageButton;
+	private final JButton lastPageButton;
 
 	public BookPreviewPanel() {
 		super(new BorderLayout());
@@ -44,22 +50,38 @@ public class BookPreviewPanel extends JPanel {
 		this.add(previewPageScrollPane, BorderLayout.CENTER);
 
 		JPanel previewButtonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-		JButton previousPageButton = new JButton("Previous Page");
-		previousPageButton.addActionListener(e -> {
+		this.firstPageButton = new JButton("First");
+		this.firstPageButton.addActionListener(e -> {
+			this.currentPage = 0;
+			displayCurrentPage();
+		});
+
+		this.previousPageButton = new JButton("Previous Page");
+		this.previousPageButton.addActionListener(e -> {
 			if (currentPage > 0) {
 				currentPage--;
 				displayCurrentPage();
 			}
 		});
-		JButton nextPageButton = new JButton("Next Page");
-		nextPageButton.addActionListener(e -> {
+
+		this.nextPageButton = new JButton("Next Page");
+		this.nextPageButton.addActionListener(e -> {
 			if (currentPage < book.getPageCount() - 1) {
 				currentPage++;
 				displayCurrentPage();
 			}
 		});
-		previewButtonPanel.add(previousPageButton);
-		previewButtonPanel.add(nextPageButton);
+
+		this.lastPageButton = new JButton("Last");
+		this.lastPageButton.addActionListener(e -> {
+			this.currentPage = Math.max(this.book.getPageCount() - 1, 0);
+			displayCurrentPage();
+		});
+
+		previewButtonPanel.add(this.firstPageButton);
+		previewButtonPanel.add(this.previousPageButton);
+		previewButtonPanel.add(this.nextPageButton);
+		previewButtonPanel.add(this.lastPageButton);
 		this.add(previewButtonPanel, BorderLayout.SOUTH);
 
 		this.setBook(new Book());
@@ -83,5 +105,12 @@ public class BookPreviewPanel extends JPanel {
 	public void setCurrentPage(int page) {
 		this.currentPage = page;
 		this.displayCurrentPage();
+	}
+
+	public void enableNavigation(boolean enabled) {
+		this.firstPageButton.setEnabled(enabled);
+		this.previousPageButton.setEnabled(enabled);
+		this.nextPageButton.setEnabled(enabled);
+		this.lastPageButton.setEnabled(enabled);
 	}
 }

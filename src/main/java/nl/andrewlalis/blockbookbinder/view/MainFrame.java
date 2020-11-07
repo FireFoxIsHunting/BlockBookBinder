@@ -65,8 +65,11 @@ public class MainFrame extends JFrame {
 
 		JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		JButton exportButton = new JButton("Export to Book");
-		exportButton.addActionListener(new BookExportActionListener(bookPreviewPanel));
+		JButton cancelExportButton = new JButton("Cancel Export");
+		cancelExportButton.setEnabled(false);
+		exportButton.addActionListener(new BookExportActionListener(bookPreviewPanel, cancelExportButton));
 		bottomPanel.add(exportButton);
+		bottomPanel.add(cancelExportButton);
 		mainPanel.add(bottomPanel, BorderLayout.SOUTH);
 
 		return mainPanel;

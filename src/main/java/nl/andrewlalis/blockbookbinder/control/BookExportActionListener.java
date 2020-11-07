@@ -5,6 +5,7 @@ import nl.andrewlalis.blockbookbinder.view.BookPreviewPanel;
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.NativeHookException;
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.event.ActionEvent;
@@ -15,9 +16,11 @@ import java.util.logging.Logger;
 public class BookExportActionListener implements ActionListener {
 	private final BookPreviewPanel bookPreviewPanel;
 	private final Clipboard clipboard;
+	private final JButton cancelExportButton;
 
-	public BookExportActionListener(BookPreviewPanel bookPreviewPanel) {
+	public BookExportActionListener(BookPreviewPanel bookPreviewPanel, JButton cancelExportButton) {
 		this.bookPreviewPanel = bookPreviewPanel;
+		this.cancelExportButton = cancelExportButton;
 		this.clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
 	}
 
@@ -25,7 +28,19 @@ public class BookExportActionListener implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		System.out.println("Starting export.");
 		final Book book = this.bookPreviewPanel.getBook();
-		BookPagePasteListener pasteListener = new BookPagePasteListener(book, clipboard);
+		int choice = JOptionPane.showConfirmDialog(
+				this.bookPreviewPanel.getRootPane(),
+				"Press CTRL+V to initialize export.",
+				"Confirm Export",
+				JOptionPane.OK_CANCEL_OPTION
+		);
+		if (choice == JOptionPane.CANCEL_OPTION) {
+			return;
+		}
+		this.cancelExportButton.setEnabled(true);
+		BookPagePasteListener pasteListener = new BookPagePasteListener(book, clipboard, this.bookPreviewPanel, this.cancelExportButton);
+		this.bookPreviewPanel.enableNavigation(false);
+		pasteListener.exportNextPage(); // Start by exporting the first page right away.
 		try {
 			// For catching native events, set logging here.
 			Logger logger = Logger.getLogger(GlobalScreen.class.getPackage().getName());

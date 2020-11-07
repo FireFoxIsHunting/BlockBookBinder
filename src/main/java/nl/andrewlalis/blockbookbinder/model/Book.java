@@ -17,6 +17,10 @@ public class Book {
 		return this.pages.size();
 	}
 
+	public void addPage(BookPage page) {
+		this.pages.add(page);
+	}
+
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder("Book of " + this.getPageCount() + " pages:\n");

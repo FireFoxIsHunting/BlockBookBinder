@@ -1,12 +1,16 @@
 package nl.andrewlalis.blockbookbinder.control;
 
-import nl.andrewlalis.blockbookbinder.model.BookBuilder;
+import nl.andrewlalis.blockbookbinder.model.build.BookBuilder;
 import nl.andrewlalis.blockbookbinder.view.BookPreviewPanel;
 import nl.andrewlalis.blockbookbinder.view.SourceTextPanel;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+/**
+ * Action listener that, when activated, converts the text from the source panel
+ * into a formatted book.
+ */
 public class ConvertToBookActionListener implements ActionListener {
 	private final SourceTextPanel sourceTextPanel;
 	private final BookPreviewPanel bookPreviewPanel;
@@ -18,6 +22,8 @@ public class ConvertToBookActionListener implements ActionListener {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		this.bookPreviewPanel.setBook(new BookBuilder().build(this.sourceTextPanel.getSourceText()));
+		this.bookPreviewPanel.setBook(
+				new BookBuilder().build(this.sourceTextPanel.getSourceText())
+		);
 	}
 }
