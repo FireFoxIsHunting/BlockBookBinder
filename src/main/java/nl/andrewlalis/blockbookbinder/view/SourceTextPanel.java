@@ -26,11 +26,6 @@ public class SourceTextPanel extends JPanel {
 		this.textArea = new JTextArea();
 		this.textArea.setWrapStyleWord(true);
 		this.textArea.setLineWrap(true);
-		try {
-			this.textArea.setText(Files.readString(Path.of(this.getClass().getClassLoader().getResource("sample/lorem_ipsum.txt").toURI())));
-		} catch (IOException | URISyntaxException e) {
-			e.printStackTrace();
-		}
 		JScrollPane scrollWrappedMainTextArea = new JScrollPane(this.textArea, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		this.add(scrollWrappedMainTextArea, BorderLayout.CENTER);
 

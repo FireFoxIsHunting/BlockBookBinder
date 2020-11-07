@@ -14,7 +14,7 @@ public class CharWidthMapper {
 	}
 
 	public int getWidth(char c) {
-		return this.charWidthMap.getOrDefault(c, 0);
+		return this.charWidthMap.getOrDefault(c, 6);
 	}
 
 	private void initCharWidthMap() {

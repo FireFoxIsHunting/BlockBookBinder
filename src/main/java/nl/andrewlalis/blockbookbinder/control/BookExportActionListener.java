@@ -13,6 +13,10 @@ import java.awt.event.ActionListener;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * Action listener that is used for when a user decides to begin exporting a
+ * book to minecraft.
+ */
 public class BookExportActionListener implements ActionListener {
 	private final BookPreviewPanel bookPreviewPanel;
 	private final Clipboard clipboard;
