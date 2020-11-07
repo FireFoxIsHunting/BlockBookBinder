@@ -3,6 +3,8 @@ package nl.andrewlalis.blockbookbinder.util;
 import lombok.Getter;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -13,6 +15,8 @@ public class ApplicationProperties {
 	private static ApplicationProperties instance;
 	@Getter
 	private final Properties properties;
+
+	private final Map<String, Integer> intPropCache;
 
 	public static ApplicationProperties getInstance() {
 		if (instance == null) {
@@ -35,8 +39,18 @@ public class ApplicationProperties {
 		return getInstance().getProperties().getProperty(key);
 	}
 
+	public static Integer getIntProp(String key) {
+		Integer value = getInstance().intPropCache.get(key);
+		if (value == null) {
+			value = Integer.parseInt(getProp(key));
+			getInstance().intPropCache.put(key, value);
+		}
+		return value;
+	}
+
 	private ApplicationProperties() throws IOException {
 		this.properties = new Properties();
 		this.properties.load(this.getClass().getClassLoader().getResourceAsStream("application.properties"));
+		this.intPropCache = new HashMap<>();
 	}
 }

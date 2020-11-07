@@ -1,5 +1,7 @@
 package nl.andrewlalis.blockbookbinder.view;
 
+import nl.andrewlalis.blockbookbinder.control.ConvertToBookActionListener;
+
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
@@ -9,14 +11,18 @@ import java.awt.*;
  * a book.
  */
 public class SourceTextPanel extends JPanel {
-	public SourceTextPanel() {
+	private final JTextArea textArea;
+
+	public SourceTextPanel(BookPreviewPanel bookPreviewPanel) {
 		super(new BorderLayout());
 
 		this.add(new JLabel("Source Text"), BorderLayout.NORTH);
 		this.setBorder(new EmptyBorder(5, 5, 5, 5));
 
-		JTextArea mainTextArea = new JTextArea();
-		JScrollPane scrollWrappedMainTextArea = new JScrollPane(mainTextArea, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		this.textArea = new JTextArea();
+		this.textArea.setWrapStyleWord(true);
+		this.textArea.setLineWrap(true);
+		JScrollPane scrollWrappedMainTextArea = new JScrollPane(this.textArea, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		this.add(scrollWrappedMainTextArea, BorderLayout.CENTER);
 
 		JPanel rightPanelButtonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -24,5 +30,13 @@ public class SourceTextPanel extends JPanel {
 		JButton importButton = new JButton("Import");
 		importButton.setActionCommand("importSource");
 		rightPanelButtonPanel.add(importButton);
+
+		JButton convertButton = new JButton("Convert to Book");
+		convertButton.addActionListener(new ConvertToBookActionListener(this, bookPreviewPanel));
+		rightPanelButtonPanel.add(convertButton);
+	}
+
+	public String getSourceText() {
+		return this.textArea.getText();
 	}
 }

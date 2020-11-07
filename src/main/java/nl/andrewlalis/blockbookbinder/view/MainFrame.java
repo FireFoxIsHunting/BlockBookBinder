@@ -1,5 +1,6 @@
 package nl.andrewlalis.blockbookbinder.view;
 
+import nl.andrewlalis.blockbookbinder.control.BookExportActionListener;
 import nl.andrewlalis.blockbookbinder.control.ImportAction;
 import nl.andrewlalis.blockbookbinder.util.ApplicationProperties;
 
@@ -56,17 +57,15 @@ public class MainFrame extends JFrame {
 		JPanel mainPanel = new JPanel(new BorderLayout());
 
 		JPanel doublePanel = new JPanel(new GridLayout(1, 2));
-		doublePanel.add(new BookPreviewPanel());
-		doublePanel.add(new SourceTextPanel());
+		BookPreviewPanel bookPreviewPanel = new BookPreviewPanel();
+		doublePanel.add(bookPreviewPanel);
+		SourceTextPanel sourceTextPanel = new SourceTextPanel(bookPreviewPanel);
+		doublePanel.add(sourceTextPanel);
 		mainPanel.add(doublePanel, BorderLayout.CENTER);
 
 		JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		JButton exportButton = new JButton("Export to Book");
-		exportButton.addActionListener(e -> {
-			System.out.println("Starting export.");
-//			final String fullText = mainTextArea.getText().trim();
-//			Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(fullText.substring(0, 200)), null);
-		});
+		exportButton.addActionListener(new BookExportActionListener(bookPreviewPanel));
 		bottomPanel.add(exportButton);
 		mainPanel.add(bottomPanel, BorderLayout.SOUTH);
 

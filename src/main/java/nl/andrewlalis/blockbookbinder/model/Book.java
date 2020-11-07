@@ -16,4 +16,14 @@ public class Book {
 	public int getPageCount() {
 		return this.pages.size();
 	}
+
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder("Book of " + this.getPageCount() + " pages:\n");
+		for (int i = 0; i < this.getPageCount(); i++) {
+			BookPage page = this.pages.get(i);
+			sb.append("Page ").append(i + 1).append(":\n").append(page).append('\n');
+		}
+		return sb.toString();
+	}
 }
