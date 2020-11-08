@@ -1,5 +1,6 @@
 package nl.andrewlalis.blockbookbinder.view;
 
+import nl.andrewlalis.blockbookbinder.control.CleanSourceActionListener;
 import nl.andrewlalis.blockbookbinder.control.ConvertToBookActionListener;
 
 import javax.swing.*;
@@ -38,9 +39,17 @@ public class SourceTextPanel extends JPanel {
 		JButton convertButton = new JButton("Convert to Book");
 		convertButton.addActionListener(new ConvertToBookActionListener(this, bookPreviewPanel));
 		rightPanelButtonPanel.add(convertButton);
+
+		JButton cleanButton = new JButton("Clean");
+		cleanButton.addActionListener(new CleanSourceActionListener(this));
+		rightPanelButtonPanel.add(cleanButton);
 	}
 
 	public String getSourceText() {
 		return this.textArea.getText();
+	}
+
+	public void setSourceText(String text) {
+		this.textArea.setText(text);
 	}
 }
