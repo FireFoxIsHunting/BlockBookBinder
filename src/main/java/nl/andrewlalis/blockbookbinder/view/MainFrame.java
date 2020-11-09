@@ -2,7 +2,9 @@ package nl.andrewlalis.blockbookbinder.view;
 
 import nl.andrewlalis.blockbookbinder.control.BookExportActionListener;
 import nl.andrewlalis.blockbookbinder.control.ImportAction;
+import nl.andrewlalis.blockbookbinder.model.Book;
 import nl.andrewlalis.blockbookbinder.util.ApplicationProperties;
+import nl.andrewlalis.blockbookbinder.view.export.ExportToBookDialog;
 
 import javax.swing.*;
 import java.awt.*;
@@ -67,7 +69,15 @@ public class MainFrame extends JFrame {
 		JButton exportButton = new JButton("Export to Book");
 		JButton cancelExportButton = new JButton("Cancel Export");
 		cancelExportButton.setEnabled(false);
-		exportButton.addActionListener(new BookExportActionListener(bookPreviewPanel, cancelExportButton));
+		exportButton.addActionListener(e -> {
+			final Book book = bookPreviewPanel.getBook();
+			if (book == null || book.getPageCount() == 0) {
+				JOptionPane.showMessageDialog(this, "Cannot export an empty book.", "Empty Book", JOptionPane.WARNING_MESSAGE);
+				return;
+			}
+			ExportToBookDialog dialog = new ExportToBookDialog(this, bookPreviewPanel.getBook());
+			dialog.setupAndShow();
+		});
 		bottomPanel.add(exportButton);
 		bottomPanel.add(cancelExportButton);
 		mainPanel.add(bottomPanel, BorderLayout.SOUTH);

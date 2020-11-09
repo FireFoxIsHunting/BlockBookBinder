@@ -8,9 +8,12 @@ import org.jnativehook.keyboard.NativeKeyEvent;
 import org.jnativehook.keyboard.NativeKeyListener;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
 
 /**
  * Listener that listens for native key-presses that indicate the user has
@@ -22,6 +25,7 @@ public class BookPagePasteListener implements NativeKeyListener {
 	private final BookPreviewPanel bookPreviewPanel;
 	private final JButton cancelExportButton;
 	private final ActionListener cancelExportActionListener;
+	private Robot robot;
 	private int nextPage;
 
 	public BookPagePasteListener(Book book, Clipboard clipboard, BookPreviewPanel bookPreviewPanel, JButton cancelExportButton) {
@@ -32,6 +36,11 @@ public class BookPagePasteListener implements NativeKeyListener {
 		this.nextPage = 0;
 		this.cancelExportActionListener = (e) -> this.cancelExport();
 		this.cancelExportButton.addActionListener(this.cancelExportActionListener);
+		try {
+			this.robot = new Robot();
+		} catch (AWTException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public void exportNextPage() {
@@ -68,7 +77,22 @@ public class BookPagePasteListener implements NativeKeyListener {
 		// If we've reached the end of the book, unregister this listener and remove native hooks.
 		if (this.nextPage >= this.book.getPageCount()) {
 			this.cancelExport();
+			return;
 		}
+
+		// Automatically do a CTRL+V and click the mouse to go to the next page.
+		this.robot.keyPress(KeyEvent.VK_CONTROL);
+		this.robot.keyPress(KeyEvent.VK_V);
+		try {
+			Thread.sleep(50);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		this.robot.keyRelease(KeyEvent.VK_V);
+		this.robot.keyRelease(KeyEvent.VK_CONTROL);
+
+		this.robot.mousePress(MouseEvent.BUTTON1_DOWN_MASK);
+		this.robot.mouseRelease(MouseEvent.BUTTON1_DOWN_MASK);
 	}
 
 	public void cancelExport() {

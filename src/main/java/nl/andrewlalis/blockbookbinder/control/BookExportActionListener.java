@@ -2,6 +2,7 @@ package nl.andrewlalis.blockbookbinder.control;
 
 import nl.andrewlalis.blockbookbinder.model.Book;
 import nl.andrewlalis.blockbookbinder.view.BookPreviewPanel;
+import nl.andrewlalis.blockbookbinder.view.export.ExportToBookDialog;
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.NativeHookException;
 
@@ -34,7 +35,7 @@ public class BookExportActionListener implements ActionListener {
 		final Book book = this.bookPreviewPanel.getBook();
 		int choice = JOptionPane.showConfirmDialog(
 				this.bookPreviewPanel.getRootPane(),
-				"Press CTRL+V to initialize export.",
+				"Press OK to initialize export.",
 				"Confirm Export",
 				JOptionPane.OK_CANCEL_OPTION
 		);

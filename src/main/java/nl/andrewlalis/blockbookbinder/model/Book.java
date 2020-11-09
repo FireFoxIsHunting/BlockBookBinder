@@ -21,6 +21,20 @@ public class Book {
 		this.pages.add(page);
 	}
 
+	/**
+	 * Gets a book containing the pages specified by the range.
+	 * @param firstIndex The index of the first page to include.
+	 * @param count The number of pages to include.
+	 * @return The book containing the range of pages.
+	 */
+	public Book getPageRange(int firstIndex, int count) {
+		Book book = new Book();
+		for (int i = 0; i < count; i++) {
+			book.addPage(this.pages.get(firstIndex + i));
+		}
+		return book;
+	}
+
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder("Book of " + this.getPageCount() + " pages:\n");
