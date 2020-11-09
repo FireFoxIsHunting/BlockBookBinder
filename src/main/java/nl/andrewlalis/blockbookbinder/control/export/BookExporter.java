@@ -3,10 +3,13 @@ package nl.andrewlalis.blockbookbinder.control.export;
 import lombok.Setter;
 import nl.andrewlalis.blockbookbinder.model.Book;
 import nl.andrewlalis.blockbookbinder.util.ApplicationProperties;
+import nl.andrewlalis.blockbookbinder.view.export.ExportStatusPanel;
+import nl.andrewlalis.blockbookbinder.view.export.ExportToBookDialog;
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.NativeHookException;
 
 import javax.sound.sampled.*;
+import javax.swing.*;
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
@@ -24,10 +27,10 @@ import java.util.logging.Logger;
 public class BookExporter implements Runnable {
 	private final static int START_DELAY = 10;
 	private final static int CLIPBOARD_RETRY_DELAY_MS = 100;
-	private final static int ROBOT_ACTION_DELAY_MS = 100;
 
 	private final Book book;
 	private final boolean autoPaste;
+	private final int autoPasteDelay;
 
 	@Setter
 	private volatile boolean running;
@@ -39,13 +42,19 @@ public class BookExporter implements Runnable {
 	private final Clipboard clipboard;
 	private Robot robot;
 
+	private final ExportStatusPanel statusPanel;
+	private final ExportToBookDialog dialog;
+
 	// Some sound clips to play as user feedback.
 	private final Clip beepClip;
 	private final Clip beginningExportClip;
 
-	public BookExporter(Book book, boolean autoPaste) {
+	public BookExporter(ExportToBookDialog dialog, ExportStatusPanel exportStatusPanel, Book book, boolean autoPaste, int autoPasteDelay) {
+		this.dialog = dialog;
+		this.statusPanel = exportStatusPanel;
 		this.book = book;
 		this.autoPaste = autoPaste;
+		this.autoPasteDelay = autoPasteDelay;
 		this.beepClip = this.loadAudioClip(ApplicationProperties.getProp("export_dialog.beep_sound"));
 		this.beginningExportClip = this.loadAudioClip(ApplicationProperties.getProp("export_dialog.beginning_export"));
 		this.clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
@@ -77,26 +86,30 @@ public class BookExporter implements Runnable {
 			}
 			// Otherwise, export one page.
 			if (!inStartPhase && this.nextPageRequested) {
-				System.out.println("Page requested: " + nextPageToExport);
 				this.nextPageRequested = false; // Reset the flag so that some other process has to set it before the next page is exported.
 				// If this is the first time we're exporting, play a sound.
 				if (lastPageExportedAt == 0) {
+					this.initStatusPanel();
 					this.initNativeListener();
 					this.playAudioClip(this.beginningExportClip);
 				}
 				this.exportPageToClipboard(nextPageToExport);
 				if (this.autoPaste) {
 					this.pasteAndTurnPage();
+				} else {
+					this.addStatusMessage("Waiting to detect a CTRL+V keypress...");
 				}
-				this.playAudioClip(this.beepClip);
 				nextPageToExport++;
+				this.updateStatusProgressBar(nextPageToExport);
 				// If we've reached the end of the book, stop the exporter.
 				if (nextPageToExport >= this.book.getPageCount()) {
-					System.out.println("Export finished: " + this.book.getPageCount() + " pages exported.");
+					this.addStatusMessage("Export finished: " + this.book.getPageCount() + " pages exported.");
 					if (!this.autoPaste) {
 						this.stopNativeListener();
 					}
 					this.running = false;
+					this.updateStatusLabel("Export finished");
+					SwingUtilities.invokeLater(dialog::onExportFinished);
 					break;
 				}
 				// Since there may be significant delay, get a fresh timestamp.
@@ -132,7 +145,7 @@ public class BookExporter implements Runnable {
 				throw new RuntimeException("Could not insert page into clipboard after " + attempts + " attempts.");
 			}
 		}
-		System.out.println("Exported page " + page + " to clipboard.");
+		this.addStatusMessage("Exported page " + (page + 1) + " to clipboard.");
 	}
 
 	/**
@@ -143,26 +156,26 @@ public class BookExporter implements Runnable {
 		this.robot.keyPress(KeyEvent.VK_CONTROL);
 		this.robot.keyPress(KeyEvent.VK_V);
 		try {
-			Thread.sleep(ROBOT_ACTION_DELAY_MS);
+			Thread.sleep(this.autoPasteDelay);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
 		this.robot.keyRelease(KeyEvent.VK_V);
 		this.robot.keyRelease(KeyEvent.VK_CONTROL);
-		System.out.println("Pasted.");
+		this.addStatusMessage("Pasted page into book.");
 		this.robot.mousePress(MouseEvent.BUTTON1_DOWN_MASK);
 		try {
-			Thread.sleep(ROBOT_ACTION_DELAY_MS);
+			Thread.sleep(this.autoPasteDelay);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
 		this.robot.mouseRelease(MouseEvent.BUTTON1_DOWN_MASK);
 		try { // Wait for minecraft to turn the page.
-			Thread.sleep(ROBOT_ACTION_DELAY_MS);
+			Thread.sleep(this.autoPasteDelay);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		System.out.println("Clicked mouse.");
+		this.addStatusMessage("Clicked to turn the page.");
 		this.nextPageRequested = true;
 	}
 
@@ -210,5 +223,35 @@ public class BookExporter implements Runnable {
 			e.printStackTrace();
 			return null;
 		}
+	}
+
+	private void initStatusPanel() {
+		SwingUtilities.invokeLater(() -> {
+			JProgressBar bar = this.statusPanel.getExportProgressBar();
+			bar.setMinimum(0);
+			bar.setMaximum(this.book.getPageCount());
+			bar.setStringPainted(true);
+			this.updateStatusProgressBar(0);
+		});
+	}
+
+	private void updateStatusLabel(String text) {
+		SwingUtilities.invokeLater(() -> {
+			this.statusPanel.getStatusLabel().setText(text);
+		});
+	}
+
+	private void updateStatusProgressBar(int nextPage) {
+		SwingUtilities.invokeLater(() -> {
+			JProgressBar bar = this.statusPanel.getExportProgressBar();
+			bar.setValue(nextPage);
+			bar.setString(String.format("%d of %d pages exported", nextPage, this.book.getPageCount()));
+		});
+	}
+
+	private void addStatusMessage(String message) {
+		SwingUtilities.invokeLater(() -> {
+			this.statusPanel.getOutputTextArea().append(message + "\n");
+		});
 	}
 }

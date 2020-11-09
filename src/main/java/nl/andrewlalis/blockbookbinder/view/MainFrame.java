@@ -1,6 +1,5 @@
 package nl.andrewlalis.blockbookbinder.view;
 
-import nl.andrewlalis.blockbookbinder.control.BookExportActionListener;
 import nl.andrewlalis.blockbookbinder.control.ImportAction;
 import nl.andrewlalis.blockbookbinder.model.Book;
 import nl.andrewlalis.blockbookbinder.util.ApplicationProperties;

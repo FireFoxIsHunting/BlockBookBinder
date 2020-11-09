@@ -21,6 +21,7 @@ public class ExportToBookDialog extends JDialog {
 	private JCheckBox autoCheckbox;
 	private JSpinner firstPageSpinner;
 	private JSpinner lastPageSpinner;
+	private JSpinner autoPasteDelaySpinner;
 
 	private JButton startButton;
 	private JButton stopButton;
@@ -54,10 +55,21 @@ public class ExportToBookDialog extends JDialog {
 		setupPanel.setLayout(new BoxLayout(setupPanel, BoxLayout.PAGE_AXIS));
 		this.autoCheckbox = new JCheckBox("Auto-paste", true);
 		this.firstPageSpinner = new JSpinner(new SpinnerNumberModel(1, 1, this.book.getPageCount(), 1));
+		JPanel firstPageSpinnerPanel = new JPanel(new BorderLayout());
+		firstPageSpinnerPanel.add(new JLabel("First Page:"), BorderLayout.WEST);
+		firstPageSpinnerPanel.add(this.firstPageSpinner, BorderLayout.CENTER);
 		this.lastPageSpinner = new JSpinner(new SpinnerNumberModel(this.book.getPageCount(), 1, this.book.getPageCount(), 1));
+		JPanel lastPageSpinnerPanel = new JPanel(new BorderLayout());
+		lastPageSpinnerPanel.add(new JLabel("Last Page:"), BorderLayout.WEST);
+		lastPageSpinnerPanel.add(this.lastPageSpinner, BorderLayout.CENTER);
+		this.autoPasteDelaySpinner = new JSpinner(new SpinnerNumberModel(0.2, 0.1, 5.0, 0.1));
+		JPanel autoPasteDelaySpinnerPanel = new JPanel(new BorderLayout());
+		autoPasteDelaySpinnerPanel.add(new JLabel("Auto-Paste Delay (s):"), BorderLayout.WEST);
+		autoPasteDelaySpinnerPanel.add(this.autoPasteDelaySpinner, BorderLayout.CENTER);
 		setupPanel.add(this.autoCheckbox);
-		setupPanel.add(this.firstPageSpinner);
-		setupPanel.add(this.lastPageSpinner);
+		setupPanel.add(firstPageSpinnerPanel);
+		setupPanel.add(lastPageSpinnerPanel);
+		setupPanel.add(autoPasteDelaySpinnerPanel);
 
 		this.exportStatusPanel = new ExportStatusPanel();
 
@@ -71,6 +83,9 @@ public class ExportToBookDialog extends JDialog {
 		JPanel controlPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
 		this.startButton = new JButton("Start");
 		this.startButton.addActionListener(e -> {
+			if (!this.checkSpinnerValues()){
+				return;
+			}
 			int choice = JOptionPane.showConfirmDialog(
 					this.rootPane,
 					"Exporting will begin after roughly 10 seconds.\n" +
@@ -97,21 +112,36 @@ public class ExportToBookDialog extends JDialog {
 		return mainPanel;
 	}
 
+	/**
+	 * Starts up the exporter thread.
+	 */
 	private void startExporter() {
 		final int firstPage = (int) this.firstPageSpinner.getValue();
 		final int lastPage = (int) this.lastPageSpinner.getValue();
 		final Book pagesRange = this.book.getPageRange(firstPage - 1, lastPage - firstPage + 1);
+
+		final double autoPasteDelay = (double) this.autoPasteDelaySpinner.getValue();
+		final int autoPasteDelayMillis = (int) (autoPasteDelay * 1000);
 
 		this.startButton.setEnabled(false);
 		this.startButton.setVisible(false);
 		this.stopButton.setEnabled(true);
 		this.stopButton.setVisible(true);
 		this.showCardByName(STATUS_CARD);
-		this.exporterRunnable = new BookExporter(pagesRange, this.autoCheckbox.isSelected());
+		this.exporterRunnable = new BookExporter(
+				this,
+				this.exportStatusPanel,
+				pagesRange,
+				this.autoCheckbox.isSelected(),
+				autoPasteDelayMillis
+		);
 		this.exporterThread = new Thread(this.exporterRunnable);
 		this.exporterThread.start();
 	}
 
+	/**
+	 * Shuts down the exporter thread.
+	 */
 	private void stopExporter() {
 		this.exporterRunnable.setRunning(false);
 		try {
@@ -126,8 +156,49 @@ public class ExportToBookDialog extends JDialog {
 		this.startButton.setVisible(true);
 	}
 
+	/**
+	 * This method is called by the exporter thread once it is done.
+	 */
+	public void onExportFinished() {
+		JOptionPane.showMessageDialog(
+				this,
+				"Book export has finished.",
+				"Export Complete",
+				JOptionPane.INFORMATION_MESSAGE
+		);
+		this.stopExporter();
+		this.dispose();
+	}
+
 	private void showCardByName(String name) {
 		CardLayout cl = (CardLayout) this.centerCardPanel.getLayout();
 		cl.show(this.centerCardPanel, name);
+	}
+
+	/**
+	 * Checks the values of the spinners that are used to select the first and
+	 * last pages, and shows a popup warning if they're not correct.
+	 */
+	private boolean checkSpinnerValues() {
+		final int firstPage = (int) this.firstPageSpinner.getValue();
+		final int lastPage = (int) this.lastPageSpinner.getValue();
+
+		if (
+				firstPage < 1
+				|| lastPage > this.book.getPageCount()
+				|| firstPage > lastPage
+				|| (lastPage - firstPage + 1 > ApplicationProperties.getIntProp("book.max_pages"))
+		) {
+			JOptionPane.showMessageDialog(
+					this,
+					"Invalid page range. Please follow the rules below:\n" +
+							"1. First page must be lower or equal to the last page.\n" +
+							"2. Number of pages to export cannot exceed 100.\n",
+					"Invalid Page Range",
+					JOptionPane.WARNING_MESSAGE
+			);
+			return false;
+		}
+		return true;
 	}
 }
