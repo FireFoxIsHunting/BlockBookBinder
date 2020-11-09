@@ -15,6 +15,7 @@ import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.logging.Level;
@@ -48,6 +49,7 @@ public class BookExporter implements Runnable {
 	// Some sound clips to play as user feedback.
 	private final Clip beepClip;
 	private final Clip beginningExportClip;
+	private final Clip finishClip;
 
 	public BookExporter(ExportToBookDialog dialog, ExportStatusPanel exportStatusPanel, Book book, boolean autoPaste, int autoPasteDelay) {
 		this.dialog = dialog;
@@ -57,6 +59,7 @@ public class BookExporter implements Runnable {
 		this.autoPasteDelay = autoPasteDelay;
 		this.beepClip = this.loadAudioClip(ApplicationProperties.getProp("export_dialog.beep_sound"));
 		this.beginningExportClip = this.loadAudioClip(ApplicationProperties.getProp("export_dialog.beginning_export"));
+		this.finishClip = this.loadAudioClip(ApplicationProperties.getProp("export_dialog.finish_sound"));
 		this.clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
 		this.pagePasteListener = new PagePasteListener(this);
 		if (this.autoPaste) { // Only initialize the robot if we'll need it.
@@ -83,6 +86,8 @@ public class BookExporter implements Runnable {
 			if (inStartPhase && currentTime - lastAudioPlayedAt > 1000) {
 				this.playAudioClip(this.beepClip);
 				lastAudioPlayedAt = currentTime;
+				int secondsLeft = (START_DELAY) - (int) (currentTime - startTime) / 1000;
+				this.updateStatusLabel("Starting in " + secondsLeft + " seconds.");
 			}
 			// Otherwise, export one page.
 			if (!inStartPhase && this.nextPageRequested) {
@@ -90,6 +95,7 @@ public class BookExporter implements Runnable {
 				// If this is the first time we're exporting, play a sound.
 				if (lastPageExportedAt == 0) {
 					this.initStatusPanel();
+					this.updateStatusLabel("Exporting.");
 					this.initNativeListener();
 					this.playAudioClip(this.beginningExportClip);
 				}
@@ -103,6 +109,7 @@ public class BookExporter implements Runnable {
 				this.updateStatusProgressBar(nextPageToExport);
 				// If we've reached the end of the book, stop the exporter.
 				if (nextPageToExport >= this.book.getPageCount()) {
+					this.playAudioClip(this.finishClip);
 					this.addStatusMessage("Export finished: " + this.book.getPageCount() + " pages exported.");
 					if (!this.autoPaste) {
 						this.stopNativeListener();
@@ -215,7 +222,7 @@ public class BookExporter implements Runnable {
 			if (fileInputStream == null) {
 				return null;
 			}
-			AudioInputStream ais = AudioSystem.getAudioInputStream(fileInputStream);
+			AudioInputStream ais = AudioSystem.getAudioInputStream(new BufferedInputStream(fileInputStream));
 			clip.open(ais);
 			return clip;
 		} catch (LineUnavailableException | IOException | UnsupportedAudioFileException e) {
