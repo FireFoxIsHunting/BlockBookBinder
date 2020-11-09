@@ -44,7 +44,7 @@ public class ExportToBookDialog extends JDialog {
 				ApplicationProperties.getIntProp("export_dialog.min_height")
 		));
 		this.pack();
-		this.setLocationRelativeTo(null);
+		this.setLocationRelativeTo(this.getOwner());
 		this.setVisible(true);
 	}
 

@@ -3,6 +3,7 @@ package nl.andrewlalis.blockbookbinder.view;
 import nl.andrewlalis.blockbookbinder.control.ImportAction;
 import nl.andrewlalis.blockbookbinder.model.Book;
 import nl.andrewlalis.blockbookbinder.util.ApplicationProperties;
+import nl.andrewlalis.blockbookbinder.view.about.AboutDialog;
 import nl.andrewlalis.blockbookbinder.view.export.ExportToBookDialog;
 
 import javax.swing.*;
@@ -13,7 +14,6 @@ import java.net.URL;
  * The main window of the application.
  */
 public class MainFrame extends JFrame {
-	private Action importAction;
 
 	public void setupAndShow() {
 		final int width = Integer.parseInt(ApplicationProperties.getProp("frame.default_width"));
@@ -26,7 +26,6 @@ public class MainFrame extends JFrame {
 			this.setIconImage(new ImageIcon(iconUrl).getImage());
 		}
 
-		this.initActions();
 		this.setContentPane(this.buildContentPane());
 		this.setJMenuBar(this.buildMenuBar());
 
@@ -35,19 +34,21 @@ public class MainFrame extends JFrame {
 		this.setVisible(true);
 	}
 
-	private void initActions() {
-		this.importAction = new ImportAction("Import");
-	}
-
 	private JMenuBar buildMenuBar() {
 		JMenuBar menuBar = new JMenuBar();
 
 		JMenu fileMenu = new JMenu("File");
-		fileMenu.add(new JMenuItem(this.importAction));
+		JMenuItem exitItem = new JMenuItem("Exit");
+		exitItem.addActionListener(e -> this.dispose());
+		fileMenu.add(exitItem);
 		menuBar.add(fileMenu);
 
 		JMenu helpMenu = new JMenu("Help");
 		JMenuItem aboutItem = new JMenuItem("About");
+		aboutItem.addActionListener(e -> {
+			AboutDialog dialog = new AboutDialog(this);
+			dialog.setupAndShow();
+		});
 		helpMenu.add(aboutItem);
 		menuBar.add(helpMenu);
 

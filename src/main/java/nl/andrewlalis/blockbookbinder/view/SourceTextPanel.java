@@ -6,10 +6,6 @@ import nl.andrewlalis.blockbookbinder.control.ConvertToBookActionListener;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 
 /**
  * A panel dedicated to displaying an interacting with a raw source of text for
@@ -32,9 +28,6 @@ public class SourceTextPanel extends JPanel {
 
 		JPanel rightPanelButtonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		this.add(rightPanelButtonPanel, BorderLayout.SOUTH);
-		JButton importButton = new JButton("Import");
-		importButton.setActionCommand("importSource");
-		rightPanelButtonPanel.add(importButton);
 
 		JButton convertButton = new JButton("Convert to Book");
 		convertButton.addActionListener(new ConvertToBookActionListener(this, bookPreviewPanel));
