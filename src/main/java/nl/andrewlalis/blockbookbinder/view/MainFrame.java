@@ -1,6 +1,5 @@
 package nl.andrewlalis.blockbookbinder.view;
 
-import nl.andrewlalis.blockbookbinder.control.ImportAction;
 import nl.andrewlalis.blockbookbinder.model.Book;
 import nl.andrewlalis.blockbookbinder.util.ApplicationProperties;
 import nl.andrewlalis.blockbookbinder.view.about.AboutDialog;
@@ -83,5 +82,11 @@ public class MainFrame extends JFrame {
 		mainPanel.add(bottomPanel, BorderLayout.SOUTH);
 
 		return mainPanel;
+	}
+
+	@Override
+	public void dispose() {
+		super.dispose();
+		System.exit(0);
 	}
 }
