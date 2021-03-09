@@ -1,6 +1,7 @@
 package nl.andrewlalis.blockbookbinder.model;
 
 import lombok.Getter;
+import nl.andrewlalis.blockbookbinder.util.ApplicationProperties;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,6 +34,20 @@ public class Book {
 			book.addPage(this.pages.get(firstIndex + i));
 		}
 		return book;
+	}
+
+	public List<Book> splitByPageLimit() {
+		final int pagesPerBook = ApplicationProperties.getIntProp("book.max_pages");
+		List<Book> books = new ArrayList<>((this.getPageCount() / pagesPerBook) + 1);
+		Book currentBook = new Book();
+		for (BookPage page : this.getPages()) {
+			currentBook.addPage(page.copy());
+			if (currentBook.getPageCount() == pagesPerBook) {
+				books.add(currentBook);
+				currentBook = new Book();
+			}
+		}
+		return books;
 	}
 
 	@Override

@@ -1,7 +1,7 @@
 package nl.andrewlalis.blockbookbinder.control;
 
 import nl.andrewlalis.blockbookbinder.model.build.BookBuilder;
-import nl.andrewlalis.blockbookbinder.view.BookPreviewPanel;
+import nl.andrewlalis.blockbookbinder.view.book.BookPreviewPanel;
 import nl.andrewlalis.blockbookbinder.view.SourceTextPanel;
 
 import java.awt.event.ActionEvent;

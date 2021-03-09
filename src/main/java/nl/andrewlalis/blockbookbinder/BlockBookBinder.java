@@ -1,5 +1,6 @@
 package nl.andrewlalis.blockbookbinder;
 
+import com.formdev.flatlaf.FlatDarkLaf;
 import nl.andrewlalis.blockbookbinder.view.MainFrame;
 
 import javax.swing.*;
@@ -10,6 +11,7 @@ import javax.swing.*;
 public class BlockBookBinder {
 	public static void main(String[] args) {
 		SwingUtilities.invokeLater(() -> {
+			FlatDarkLaf.install();
 			var mainFrame = new MainFrame();
 			mainFrame.setupAndShow();
 		});

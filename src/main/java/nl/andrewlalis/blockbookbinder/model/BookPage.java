@@ -13,7 +13,7 @@ public class BookPage {
 	}
 
 	public boolean addLine(String line) {
-		if (this.lines.size() == ApplicationProperties.getIntProp("book.page_max_lines")) {
+		if (this.lines.size() >= ApplicationProperties.getIntProp("book.page_max_lines")) {
 			return false;
 		}
 		this.lines.add(line);
@@ -24,8 +24,24 @@ public class BookPage {
 		return !this.lines.isEmpty();
 	}
 
+	public BookPage copy() {
+		BookPage c = new BookPage();
+		for (String line : this.lines) {
+			c.addLine(line);
+		}
+		return c;
+	}
+
 	@Override
 	public String toString() {
 		return String.join("\n", this.lines);
+	}
+
+	public static BookPage fromString(String s) {
+		BookPage p = new BookPage();
+		for (String line : s.split("\n")) {
+			p.addLine(line);
+		}
+		return p;
 	}
 }

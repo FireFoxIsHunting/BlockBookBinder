@@ -1,4 +1,4 @@
-package nl.andrewlalis.blockbookbinder.view;
+package nl.andrewlalis.blockbookbinder.view.book;
 
 import lombok.Getter;
 import nl.andrewlalis.blockbookbinder.model.Book;

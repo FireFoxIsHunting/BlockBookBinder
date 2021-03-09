@@ -3,10 +3,14 @@ package nl.andrewlalis.blockbookbinder.control.export;
 import org.jnativehook.keyboard.NativeKeyEvent;
 import org.jnativehook.keyboard.NativeKeyListener;
 
-public class PagePasteListener implements NativeKeyListener {
-	private BookExporter exporterRunnable;
+/**
+ * Native key listener that's used during the export process, to detect when the
+ * user performs certain key actions outside of the focus of this program.
+ */
+public class ExporterKeyListener implements NativeKeyListener {
+	private final BookExporter exporterRunnable;
 
-	public PagePasteListener(BookExporter exporterRunnable) {
+	public ExporterKeyListener(BookExporter exporterRunnable) {
 		this.exporterRunnable = exporterRunnable;
 	}
 

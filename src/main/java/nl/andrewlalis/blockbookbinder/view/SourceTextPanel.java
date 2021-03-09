@@ -2,6 +2,7 @@ package nl.andrewlalis.blockbookbinder.view;
 
 import nl.andrewlalis.blockbookbinder.control.CleanSourceActionListener;
 import nl.andrewlalis.blockbookbinder.control.ConvertToBookActionListener;
+import nl.andrewlalis.blockbookbinder.view.book.BookPreviewPanel;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;

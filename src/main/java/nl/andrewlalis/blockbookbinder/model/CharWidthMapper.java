@@ -1,11 +1,15 @@
 package nl.andrewlalis.blockbookbinder.model;
 
+import lombok.Getter;
 import nl.andrewlalis.blockbookbinder.util.ApplicationProperties;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class CharWidthMapper {
+	@Getter
+	private static final CharWidthMapper instance = new CharWidthMapper();
+
 	private final Map<Character, Integer> charWidthMap;
 
 	public CharWidthMapper() {

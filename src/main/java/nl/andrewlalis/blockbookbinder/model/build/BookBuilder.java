@@ -9,8 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BookBuilder {
-	private final CharWidthMapper charWidthMapper = new CharWidthMapper();
-
 	/**
 	 * Builds a full book of pages from the given source text.
 	 * @param source The source text to convert.
@@ -60,7 +58,7 @@ public class BookBuilder {
 			sourceIndex++;
 			symbolBuilder.setLength(0);
 			symbolBuilder.append(c);
-			int symbolWidth = this.charWidthMapper.getWidth(c);
+			int symbolWidth = CharWidthMapper.getInstance().getWidth(c);
 
 			// Since there's a 1-pixel gap between characters, add it to the width if this isn't the first char.
 			if (lineBuilder.length() > 0) {
@@ -88,7 +86,7 @@ public class BookBuilder {
 				) {
 					char nextChar = sourceChars[sourceIndex];
 					symbolBuilder.append(nextChar);
-					symbolWidth += 1 + this.charWidthMapper.getWidth(nextChar);
+					symbolWidth += 1 + CharWidthMapper.getInstance().getWidth(nextChar);
 					sourceIndex++;
 				}
 			}

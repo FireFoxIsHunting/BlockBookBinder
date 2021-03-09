@@ -3,6 +3,7 @@ package nl.andrewlalis.blockbookbinder.view;
 import nl.andrewlalis.blockbookbinder.model.Book;
 import nl.andrewlalis.blockbookbinder.util.ApplicationProperties;
 import nl.andrewlalis.blockbookbinder.view.about.AboutDialog;
+import nl.andrewlalis.blockbookbinder.view.book.BookPreviewPanel;
 import nl.andrewlalis.blockbookbinder.view.export.ExportToBookDialog;
 
 import javax.swing.*;
@@ -13,11 +14,11 @@ import java.net.URL;
  * The main window of the application.
  */
 public class MainFrame extends JFrame {
-
 	public void setupAndShow() {
-		final int width = Integer.parseInt(ApplicationProperties.getProp("frame.default_width"));
-		final int height = Integer.parseInt(ApplicationProperties.getProp("frame.default_height"));
-		this.setPreferredSize(new Dimension(width, height));
+		this.setPreferredSize(new Dimension(
+				ApplicationProperties.getIntProp("frame.default_width"),
+				ApplicationProperties.getIntProp("frame.default_height")
+		));
 		this.setTitle(ApplicationProperties.getProp("frame.title"));
 		this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		final URL iconUrl = this.getClass().getClassLoader().getResource("images/book_and_quill.png");

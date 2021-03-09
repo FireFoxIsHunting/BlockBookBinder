@@ -39,7 +39,7 @@ public class BookExporter implements Runnable {
 	@Setter
 	private volatile boolean nextPageRequested;
 
-	private final PagePasteListener pagePasteListener;
+	private final ExporterKeyListener exporterKeyListener;
 	private final Clipboard clipboard;
 	private Robot robot;
 
@@ -61,7 +61,7 @@ public class BookExporter implements Runnable {
 		this.beginningExportClip = this.loadAudioClip(ApplicationProperties.getProp("export_dialog.beginning_export"));
 		this.finishClip = this.loadAudioClip(ApplicationProperties.getProp("export_dialog.finish_sound"));
 		this.clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-		this.pagePasteListener = new PagePasteListener(this);
+		this.exporterKeyListener = new ExporterKeyListener(this);
 		if (this.autoPaste) { // Only initialize the robot if we'll need it.
 			try {
 				this.robot = new Robot();
@@ -193,7 +193,7 @@ public class BookExporter implements Runnable {
 			logger.setLevel(Level.WARNING);
 			logger.setUseParentHandlers(false);
 			GlobalScreen.registerNativeHook();
-			GlobalScreen.addNativeKeyListener(this.pagePasteListener);
+			GlobalScreen.addNativeKeyListener(this.exporterKeyListener);
 		} catch (NativeHookException nativeHookException) {
 			System.err.println("Could not register native hook.");
 			nativeHookException.printStackTrace();
@@ -202,7 +202,7 @@ public class BookExporter implements Runnable {
 
 	private void stopNativeListener() {
 		try {
-			GlobalScreen.removeNativeKeyListener(this.pagePasteListener);
+			GlobalScreen.removeNativeKeyListener(this.exporterKeyListener);
 			GlobalScreen.unregisterNativeHook();
 		} catch (NativeHookException nativeHookException) {
 			System.err.println("Could not unregister a native hook.");
@@ -243,9 +243,7 @@ public class BookExporter implements Runnable {
 	}
 
 	private void updateStatusLabel(String text) {
-		SwingUtilities.invokeLater(() -> {
-			this.statusPanel.getStatusLabel().setText(text);
-		});
+		SwingUtilities.invokeLater(() -> this.statusPanel.getStatusLabel().setText(text));
 	}
 
 	private void updateStatusProgressBar(int nextPage) {
@@ -257,8 +255,6 @@ public class BookExporter implements Runnable {
 	}
 
 	private void addStatusMessage(String message) {
-		SwingUtilities.invokeLater(() -> {
-			this.statusPanel.getOutputTextArea().append(message + "\n");
-		});
+		SwingUtilities.invokeLater(() -> this.statusPanel.getOutputTextArea().append(message + "\n"));
 	}
 }
