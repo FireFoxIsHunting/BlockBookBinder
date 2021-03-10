@@ -2,7 +2,7 @@ package nl.andrewlalis.blockbookbinder.model.build;
 
 import nl.andrewlalis.blockbookbinder.model.Book;
 import nl.andrewlalis.blockbookbinder.model.BookPage;
-import nl.andrewlalis.blockbookbinder.model.CharWidthMapper;
+import nl.andrewlalis.blockbookbinder.util.CharWidthMapper;
 import nl.andrewlalis.blockbookbinder.util.ApplicationProperties;
 
 import java.util.ArrayList;
@@ -16,7 +16,7 @@ public class BookBuilder {
 	 */
 	public Book build(String source) {
 		final int maxLines = ApplicationProperties.getIntProp("book.page_max_lines");
-		List<String> lines = this.convertSourceToLines(source);
+		List<String> lines = this.convertSourceToLines(this.cleanSource(source));
 		Book book = new Book();
 		BookPage page = new BookPage();
 		int currentPageLineCount = 0;
@@ -36,6 +36,21 @@ public class BookBuilder {
 		}
 
 		return book;
+	}
+
+	/**
+	 * Cleans a given source text, by removing superfluous newlines that won't
+	 * look too nice in minecraft text, and by erasing manually-imposed single
+	 * newlines that may be in the source text to format it in a normal editor.
+	 * @param source The source text.
+	 * @return The cleaned string.
+	 */
+	public String cleanSource(String source) {
+		return source.trim()
+			.replaceAll("(?>\\v)+(\\v)", "\n\n") // Replace large chunks of newline with just two.
+			.replaceAll("\\S\n\\S", " ") // Unwrap previously-imposed single-line wrapping.
+			.replaceAll("\t", "  ") // Replace tabs with single-spaces, due to space constraints.
+			.replaceAll(" [ ]+", " "); // Remove any superfluous spaces.
 	}
 
 	/**

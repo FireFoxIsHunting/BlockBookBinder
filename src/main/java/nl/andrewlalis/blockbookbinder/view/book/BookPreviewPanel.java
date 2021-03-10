@@ -6,6 +6,7 @@ import nl.andrewlalis.blockbookbinder.model.BookPage;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import javax.swing.text.AbstractDocument;
 import java.awt.*;
 import java.io.IOException;
 import java.io.InputStream;
@@ -19,6 +20,7 @@ public class BookPreviewPanel extends JPanel {
 	private int currentPage = 0;
 
 	private final JTextArea previewPageTextArea;
+	private final BookPageDocumentFilter documentFilter;
 	private final JLabel titleLabel;
 
 	private final JButton previousPageButton;
@@ -34,7 +36,10 @@ public class BookPreviewPanel extends JPanel {
 		this.setBorder(new EmptyBorder(5, 5, 5, 5));
 
 		this.previewPageTextArea = new JTextArea();
-		this.previewPageTextArea.setEditable(false);
+		this.documentFilter = new BookPageDocumentFilter();
+		AbstractDocument doc = (AbstractDocument) this.previewPageTextArea.getDocument();
+		doc.setDocumentFilter(this.documentFilter);
+		this.previewPageTextArea.setEditable(true);
 		try {
 			InputStream is = this.getClass().getClassLoader().getResourceAsStream("fonts/1_Minecraft-Regular.otf");
 			if (is == null) {
@@ -84,7 +89,9 @@ public class BookPreviewPanel extends JPanel {
 		previewButtonPanel.add(this.lastPageButton);
 		this.add(previewButtonPanel, BorderLayout.SOUTH);
 
-		this.setBook(new Book());
+		Book starterBook = new Book();
+		starterBook.addPage(new BookPage());
+		this.setBook(starterBook);
 	}
 
 	private void displayCurrentPage() {
@@ -98,12 +105,12 @@ public class BookPreviewPanel extends JPanel {
 
 	public void setBook(Book book) {
 		this.book = book;
-		this.currentPage = 0;
-		this.displayCurrentPage();
+		this.setCurrentPage(0);
 	}
 
 	public void setCurrentPage(int page) {
 		this.currentPage = page;
+		this.documentFilter.setPage(this.book.getPage(page));
 		this.displayCurrentPage();
 	}
 

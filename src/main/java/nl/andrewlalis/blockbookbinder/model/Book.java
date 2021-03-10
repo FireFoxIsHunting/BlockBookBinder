@@ -22,6 +22,11 @@ public class Book {
 		this.pages.add(page);
 	}
 
+	public BookPage getPage(int index) {
+		if (index < 0 || index >= this.pages.size()) return null;
+		return this.pages.get(index);
+	}
+
 	/**
 	 * Gets a book containing the pages specified by the range.
 	 * @param firstIndex The index of the first page to include.

@@ -20,6 +20,24 @@ public class BookPage {
 		return true;
 	}
 
+	public String getLine(int index) {
+		if (index < 0 || index >= this.lines.size()) {
+			return null;
+		}
+		return this.lines.get(index);
+	}
+
+	public int getLineIndexAtOffset(int offset) {
+		int lineIndex = 0;
+		String line = this.getLine(lineIndex);
+		if (line == null) return -1;
+		while (offset - line.length() > 0) {
+			offset-= line.length();
+			line = this.getLine(++lineIndex);
+		}
+		return lineIndex;
+	}
+
 	public boolean hasContent() {
 		return !this.lines.isEmpty();
 	}

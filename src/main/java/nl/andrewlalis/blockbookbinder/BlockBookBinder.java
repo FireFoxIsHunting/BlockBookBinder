@@ -10,8 +10,8 @@ import javax.swing.*;
  */
 public class BlockBookBinder {
 	public static void main(String[] args) {
+		FlatDarkLaf.install();
 		SwingUtilities.invokeLater(() -> {
-			FlatDarkLaf.install();
 			var mainFrame = new MainFrame();
 			mainFrame.setupAndShow();
 		});

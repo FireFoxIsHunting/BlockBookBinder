@@ -58,12 +58,8 @@ public class MainFrame extends JFrame {
 	private Container buildContentPane() {
 		JPanel mainPanel = new JPanel(new BorderLayout());
 
-		JPanel doublePanel = new JPanel(new GridLayout(1, 2));
 		BookPreviewPanel bookPreviewPanel = new BookPreviewPanel();
-		doublePanel.add(bookPreviewPanel);
-		SourceTextPanel sourceTextPanel = new SourceTextPanel(bookPreviewPanel);
-		doublePanel.add(sourceTextPanel);
-		mainPanel.add(doublePanel, BorderLayout.CENTER);
+		mainPanel.add(bookPreviewPanel, BorderLayout.CENTER);
 
 		JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		JButton exportButton = new JButton("Export to Book");
