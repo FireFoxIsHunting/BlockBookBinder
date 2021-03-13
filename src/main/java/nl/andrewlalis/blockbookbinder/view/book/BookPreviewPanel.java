@@ -88,7 +88,6 @@ public class BookPreviewPanel extends JPanel {
 		previewButtonPanel.add(this.nextPageButton);
 		previewButtonPanel.add(this.lastPageButton);
 		this.add(previewButtonPanel, BorderLayout.SOUTH);
-
 		Book starterBook = new Book();
 		starterBook.addPage(new BookPage());
 		this.setBook(starterBook);
