@@ -1,19 +1,22 @@
-package nl.andrewlalis.blockbookbinder.control;
+package nl.andrewlalis.blockbookbinder.control.source;
 
+import lombok.Getter;
+import lombok.Setter;
 import nl.andrewlalis.blockbookbinder.view.SourceTextPanel;
 
+import javax.swing.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
-/**
- * Listener for an action where the source text is 'cleaned' by removing any
- * trailing whitespace, and removing unnecessary newlines.
- */
-public class CleanSourceActionListener implements ActionListener {
-	private final SourceTextPanel sourceTextPanel;
+public class CleanSourceAction extends AbstractAction {
+	@Getter
+	private final static CleanSourceAction instance = new CleanSourceAction();
 
-	public CleanSourceActionListener(SourceTextPanel sourceTextPanel) {
-		this.sourceTextPanel = sourceTextPanel;
+	@Setter
+	private SourceTextPanel sourceTextPanel;
+
+	public CleanSourceAction() {
+		super("Clean Source");
+		this.putValue(SHORT_DESCRIPTION, "Clean up the source text.");
 	}
 
 	@Override

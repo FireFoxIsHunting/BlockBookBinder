@@ -1,10 +1,13 @@
 package nl.andrewlalis.blockbookbinder.view;
 
-import nl.andrewlalis.blockbookbinder.model.Book;
+import nl.andrewlalis.blockbookbinder.BlockBookBinder;
+import nl.andrewlalis.blockbookbinder.control.export.ExportBookToMinecraftAction;
+import nl.andrewlalis.blockbookbinder.control.source.CleanSourceAction;
+import nl.andrewlalis.blockbookbinder.control.source.CompileFromSourceAction;
+import nl.andrewlalis.blockbookbinder.control.source.ImportSourceAction;
 import nl.andrewlalis.blockbookbinder.util.ApplicationProperties;
 import nl.andrewlalis.blockbookbinder.view.about.AboutDialog;
 import nl.andrewlalis.blockbookbinder.view.book.BookPreviewPanel;
-import nl.andrewlalis.blockbookbinder.view.export.ExportToBookDialog;
 
 import javax.swing.*;
 import java.awt.*;
@@ -19,7 +22,7 @@ public class MainFrame extends JFrame {
 				ApplicationProperties.getIntProp("frame.default_width"),
 				ApplicationProperties.getIntProp("frame.default_height")
 		));
-		this.setTitle(ApplicationProperties.getProp("frame.title"));
+		this.setTitle(ApplicationProperties.getProp("frame.title") + " Version " + BlockBookBinder.VERSION);
 		this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		final URL iconUrl = this.getClass().getClassLoader().getResource("images/book_and_quill.png");
 		if (iconUrl != null) {
@@ -34,14 +37,40 @@ public class MainFrame extends JFrame {
 		this.setVisible(true);
 	}
 
+	private Container buildContentPane() {
+		JPanel mainPanel = new JPanel(new BorderLayout());
+		JPanel doublePanel = new JPanel(new GridLayout(1, 2));
+
+		BookPreviewPanel bookPreviewPanel = new BookPreviewPanel();
+		doublePanel.add(bookPreviewPanel);
+		CompileFromSourceAction.getInstance().setBookPreviewPanel(bookPreviewPanel);
+		ExportBookToMinecraftAction.getInstance().setBookPreviewPanel(bookPreviewPanel);
+
+		SourceTextPanel sourceTextPanel = new SourceTextPanel();
+		doublePanel.add(sourceTextPanel);
+		CompileFromSourceAction.getInstance().setSourceTextPanel(sourceTextPanel);
+		CleanSourceAction.getInstance().setSourceTextPanel(sourceTextPanel);
+
+		mainPanel.add(doublePanel, BorderLayout.CENTER);
+
+		return mainPanel;
+	}
+
 	private JMenuBar buildMenuBar() {
 		JMenuBar menuBar = new JMenuBar();
 
 		JMenu fileMenu = new JMenu("File");
+		fileMenu.add(ImportSourceAction.getInstance());
 		JMenuItem exitItem = new JMenuItem("Exit");
 		exitItem.addActionListener(e -> this.dispose());
 		fileMenu.add(exitItem);
 		menuBar.add(fileMenu);
+
+		JMenu bookMenu = new JMenu("Book");
+		bookMenu.add(CompileFromSourceAction.getInstance());
+		bookMenu.add(CleanSourceAction.getInstance());
+		bookMenu.add(ExportBookToMinecraftAction.getInstance());
+		menuBar.add(bookMenu);
 
 		JMenu helpMenu = new JMenu("Help");
 		JMenuItem aboutItem = new JMenuItem("About");
@@ -53,36 +82,6 @@ public class MainFrame extends JFrame {
 		menuBar.add(helpMenu);
 
 		return menuBar;
-	}
-
-	private Container buildContentPane() {
-		JPanel mainPanel = new JPanel(new BorderLayout());
-
-		JPanel doublePanel = new JPanel(new GridLayout(1, 2));
-		BookPreviewPanel bookPreviewPanel = new BookPreviewPanel();
-		doublePanel.add(bookPreviewPanel);
-		SourceTextPanel sourceTextPanel = new SourceTextPanel(bookPreviewPanel);
-		doublePanel.add(sourceTextPanel);
-		mainPanel.add(doublePanel, BorderLayout.CENTER);
-
-		JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-		JButton exportButton = new JButton("Export to Book");
-		JButton cancelExportButton = new JButton("Cancel Export");
-		cancelExportButton.setEnabled(false);
-		exportButton.addActionListener(e -> {
-			final Book book = bookPreviewPanel.getBook();
-			if (book == null || book.getPageCount() == 0) {
-				JOptionPane.showMessageDialog(this, "Cannot export an empty book.", "Empty Book", JOptionPane.WARNING_MESSAGE);
-				return;
-			}
-			ExportToBookDialog dialog = new ExportToBookDialog(this, bookPreviewPanel.getBook());
-			dialog.setupAndShow();
-		});
-		bottomPanel.add(exportButton);
-		bottomPanel.add(cancelExportButton);
-		mainPanel.add(bottomPanel, BorderLayout.SOUTH);
-
-		return mainPanel;
 	}
 
 	@Override

@@ -31,8 +31,8 @@ public class ExportToBookDialog extends JDialog {
 	private Thread exporterThread;
 	private BookExporter exporterRunnable;
 
-	public ExportToBookDialog(Frame owner, Book book) {
-		super(owner, "Export to Book", true);
+	public ExportToBookDialog(Window owner, Book book) {
+		super(owner, "Export to Book");
 		this.book = book;
 	}
 
