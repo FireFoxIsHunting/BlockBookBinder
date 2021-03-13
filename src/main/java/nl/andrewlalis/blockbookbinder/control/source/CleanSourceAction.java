@@ -24,7 +24,8 @@ public class CleanSourceAction extends AbstractAction {
 		final String source = this.sourceTextPanel.getSourceText();
 		String updated = source.trim()
 				.replaceAll("(?>\\v)+(\\v)", "\n\n") // Replace large chunks of newline with just two.
-				.replace("  ", " "); // Remove any double spaces.
+				.replaceAll("\\t", " ") // Replace tabs with single-spaces, for space savings.
+				.replaceAll("  +", " "); // Remove any double spaces.
 		updated = this.removeNewlineWrapping(updated);
 		this.sourceTextPanel.setSourceText(updated);
 	}
