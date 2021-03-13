@@ -3,6 +3,7 @@ package nl.andrewlalis.blockbookbinder.view.book;
 import lombok.Getter;
 import nl.andrewlalis.blockbookbinder.model.Book;
 import nl.andrewlalis.blockbookbinder.model.BookPage;
+import nl.andrewlalis.blockbookbinder.util.IconLoader;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -50,13 +51,15 @@ public class BookPreviewPanel extends JPanel {
 		this.add(previewPageScrollPane, BorderLayout.CENTER);
 
 		JPanel previewButtonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-		this.firstPageButton = new JButton("First");
+		this.firstPageButton = new JButton();
+		this.firstPageButton.setIcon(IconLoader.load("images/page_first.png", 16, 16));
 		this.firstPageButton.addActionListener(e -> {
 			this.currentPage = 0;
 			displayCurrentPage();
 		});
 
-		this.previousPageButton = new JButton("Previous Page");
+		this.previousPageButton = new JButton();
+		this.previousPageButton.setIcon(IconLoader.load("images/page_left.png", 16, 16));
 		this.previousPageButton.addActionListener(e -> {
 			if (currentPage > 0) {
 				currentPage--;
@@ -64,15 +67,16 @@ public class BookPreviewPanel extends JPanel {
 			}
 		});
 
-		this.nextPageButton = new JButton("Next Page");
+		this.nextPageButton = new JButton();
+		this.nextPageButton.setIcon(IconLoader.load("images/page_right.png", 16, 16));
 		this.nextPageButton.addActionListener(e -> {
 			if (currentPage < book.getPageCount() - 1) {
 				currentPage++;
 				displayCurrentPage();
 			}
 		});
-
-		this.lastPageButton = new JButton("Last");
+		this.lastPageButton = new JButton();
+		this.lastPageButton.setIcon(IconLoader.load("images/page_last.png", 16, 16));
 		this.lastPageButton.addActionListener(e -> {
 			this.currentPage = Math.max(this.book.getPageCount() - 1, 0);
 			displayCurrentPage();
