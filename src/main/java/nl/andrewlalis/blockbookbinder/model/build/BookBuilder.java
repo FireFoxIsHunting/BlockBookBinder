@@ -2,8 +2,8 @@ package nl.andrewlalis.blockbookbinder.model.build;
 
 import nl.andrewlalis.blockbookbinder.model.Book;
 import nl.andrewlalis.blockbookbinder.model.BookPage;
-import nl.andrewlalis.blockbookbinder.util.CharWidthMapper;
 import nl.andrewlalis.blockbookbinder.util.ApplicationProperties;
+import nl.andrewlalis.blockbookbinder.util.CharWidthMapper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,22 +15,22 @@ public class BookBuilder {
 	 * @return A book containing the source text formatted for a minecraft book.
 	 */
 	public Book build(String source) {
-		final int maxLines = ApplicationProperties.getIntProp("book.page_max_lines");
 		List<String> lines = this.convertSourceToLines(this.cleanSource(source));
 		Book book = new Book();
 		BookPage page = new BookPage();
 		int currentPageLineCount = 0;
 
 		for (String line : lines) {
-			page.addLine(line);
+			page.setLine(currentPageLineCount, line);
 			currentPageLineCount++;
-			if (currentPageLineCount == maxLines) {
+			if (currentPageLineCount == BookPage.MAX_LINES) {
 				book.addPage(page);
 				page = new BookPage();
 				currentPageLineCount = 0;
 			}
 		}
 
+		// Check the last page, and only add it if it contains content.
 		if (page.hasContent()) {
 			book.addPage(page);
 		}
@@ -49,7 +49,7 @@ public class BookBuilder {
 		return source.trim()
 			.replaceAll("(?>\\v)+(\\v)", "\n\n") // Replace large chunks of newline with just two.
 			.replaceAll("\\S\n\\S", " ") // Unwrap previously-imposed single-line wrapping.
-			.replaceAll("\t", "  ") // Replace tabs with single-spaces, due to space constraints.
+			.replaceAll("\t", " ") // Replace tabs with single-spaces, due to space constraints.
 			.replaceAll(" [ ]+", " "); // Remove any superfluous spaces.
 	}
 

@@ -19,7 +19,7 @@ public class BookPreviewPanel extends JPanel {
 	private Book book;
 	private int currentPage = 0;
 
-	private final JTextArea previewPageTextArea;
+	private final JEditorPane pageEditorPane;
 	private final BookPageDocumentFilter documentFilter;
 	private final JLabel titleLabel;
 
@@ -35,11 +35,11 @@ public class BookPreviewPanel extends JPanel {
 		this.add(this.titleLabel, BorderLayout.NORTH);
 		this.setBorder(new EmptyBorder(5, 5, 5, 5));
 
-		this.previewPageTextArea = new JTextArea();
+		this.pageEditorPane = new JEditorPane();
 		this.documentFilter = new BookPageDocumentFilter();
-		AbstractDocument doc = (AbstractDocument) this.previewPageTextArea.getDocument();
+		AbstractDocument doc = (AbstractDocument) this.pageEditorPane.getDocument();
 		doc.setDocumentFilter(this.documentFilter);
-		this.previewPageTextArea.setEditable(true);
+		this.pageEditorPane.setEditable(true);
 		try {
 			InputStream is = this.getClass().getClassLoader().getResourceAsStream("fonts/1_Minecraft-Regular.otf");
 			if (is == null) {
@@ -47,11 +47,11 @@ public class BookPreviewPanel extends JPanel {
 			}
 			Font mcFont = Font.createFont(Font.TRUETYPE_FONT, is);
 			mcFont = mcFont.deriveFont(24.0f);
-			this.previewPageTextArea.setFont(mcFont);
+			this.pageEditorPane.setFont(mcFont);
 		} catch (FontFormatException | IOException e) {
 			e.printStackTrace();
 		}
-		JScrollPane previewPageScrollPane = new JScrollPane(this.previewPageTextArea, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		JScrollPane previewPageScrollPane = new JScrollPane(this.pageEditorPane, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		this.add(previewPageScrollPane, BorderLayout.CENTER);
 
 		JPanel previewButtonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
@@ -99,7 +99,7 @@ public class BookPreviewPanel extends JPanel {
 			return;
 		}
 		BookPage currentPage = this.book.getPages().get(this.currentPage);
-		this.previewPageTextArea.setText(currentPage.toString());
+		this.pageEditorPane.setText(currentPage.toString());
 		this.titleLabel.setText("Book Preview (Page " + (this.currentPage + 1) + " of " + this.book.getPageCount() + ")");
 	}
 
